@@ -69,9 +69,8 @@ class PublicHolidaysNextYearWizard(models.TransientModel):
 
         for ph in pholidays:
 
-            last_ph_country = last_ph_dict.get(ph.country_id, False)
 
-            if last_ph_country:
+            if last_ph_country := last_ph_dict.get(ph.country_id, False):
                 if last_ph_country.year < ph.year:
                     last_ph_dict[ph.country_id] = ph
             else:
@@ -92,11 +91,10 @@ class PublicHolidaysNextYearWizard(models.TransientModel):
             for last_ph_line in last_ph.line_ids:
                 ph_line_date = fields.Date.from_string(last_ph_line.date)
 
-                feb_29 = (
-                    ph_line_date.month == 2 and
-                    ph_line_date.day == 29)
 
-                if feb_29:
+                if feb_29 := (
+                    ph_line_date.month == 2 and
+                    ph_line_date.day == 29):
                     # Handling this rare case would mean quite a lot of
                     # complexity because previous or next day might also be a
                     # public holiday.

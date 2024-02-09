@@ -85,8 +85,7 @@ class HrPayslipRun(models.Model):
 
     @api.onchange('hr_period_id')
     def onchange_period_id(self):
-        period = self.hr_period_id
-        if period:
+        if period := self.hr_period_id:
             self.date_start = period.date_start
             self.date_end = period.date_end
             self.date_payment = period.date_payment
@@ -147,14 +146,12 @@ class HrPayslipRun(models.Model):
     @api.multi
     def update_periods(self):
         self.ensure_one()
-        period = self.hr_period_id
-        if period:
+        if period := self.hr_period_id:
             # Close the current period
             period.button_close()
 
             # Open the next period of the fiscal year
             fiscal_year = period.fiscalyear_id
-            next_period = fiscal_year.search_period(
-                number=period.number + 1)
-            if next_period:
+            if next_period := fiscal_year.search_period(
+                number=period.number + 1):
                 next_period.button_open()

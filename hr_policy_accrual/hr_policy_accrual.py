@@ -275,9 +275,8 @@ class hr_policy(orm.Model):
 
         pg_ids = pg_obj.search(cr, uid, [], context=context)
         for pg in pg_obj.browse(cr, uid, pg_ids, context=context):
-            accrual_policy = self.get_latest_policy(
-                cr, uid, pg, dToday, context=context)
-            if accrual_policy is None:
+            if (accrual_policy := self.get_latest_policy(
+                cr, uid, pg, dToday, context=context)) is None:
                 continue
 
             # Get the last time that an accrual job was run for each accrual
@@ -287,9 +286,8 @@ class hr_policy(orm.Model):
             #
             line_jobs = {}
             for line in accrual_policy.line_ids:
-                d = self._get_last_calculation_date(
-                    cr, uid, line.id, context=context)
-                if d is None:
+                if (d := self._get_last_calculation_date(
+                    cr, uid, line.id, context=context)) is None:
                     line_jobs[line.id] = [dToday]
                 else:
                     line_jobs[line.id] = []

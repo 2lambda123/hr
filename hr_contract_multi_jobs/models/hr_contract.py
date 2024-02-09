@@ -32,8 +32,7 @@ class hr_contract(models.Model):
         Get the main job position from the field contract_job_ids which
         contains one and only one record with field is_main_job == True
         """
-        main_job = self.contract_job_ids.filtered('is_main_job') or False
-        if main_job:
+        if main_job := self.contract_job_ids.filtered('is_main_job') or False:
             main_job = main_job[0].job_id.id
         self.job_id = main_job
 

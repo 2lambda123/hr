@@ -286,8 +286,7 @@ WHERE (date_start <= %s and %s <= date_end)
         #
         restday_ids = False
         dSchedStart = datetime.strptime(sched.date_start, OE_DFORMAT).date()
-        dWeekStart = datetime.strptime(week_start, OE_DFORMAT).date()
-        if dWeekStart == dSchedStart:
+        if (dWeekStart := datetime.strptime(week_start, OE_DFORMAT).date()) == dSchedStart:
             restday_ids = sched.restday_ids1
         elif dWeekStart == dSchedStart + relativedelta(days=+7):
             restday_ids = sched.restday_ids2

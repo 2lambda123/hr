@@ -54,9 +54,8 @@ class HrSalaryRule(models.Model):
 
         benefits = self._filter_benefits(payslip, **kwargs)
 
-        employer = kwargs.get('employer', False)
 
-        if employer:
+        if employer := kwargs.get('employer', False):
             res = sum(ben.employer_amount for ben in benefits)
         else:
             res = sum(ben.employee_amount for ben in benefits)

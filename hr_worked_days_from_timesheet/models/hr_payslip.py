@@ -42,9 +42,8 @@ class HrPayslip(models.Model):
         """
         # Create one worked days record for each timesheet sheet
         for ts_sheet in timesheet_sheets:
-            worked_days_data = self.prepare_worked_days(
-                payslip, ts_sheet, date_from, date_to)
-            if worked_days_data:
+            if worked_days_data := self.prepare_worked_days(
+                payslip, ts_sheet, date_from, date_to):
                 self.env['hr.payslip.worked_days'].create(worked_days_data)
 
     @api.multi

@@ -247,9 +247,8 @@ class restday(orm.TransientModel):
         sched_obj = self.pool.get('hr.schedule')
         nrest_days = [dayofweek] + rest_days[1:]
         dSchedStart = datetime.strptime(sched.date_start, OE_DFORMAT).date()
-        dWeekStart = sched.date_start < week_start and datetime.strptime(
-            week_start, OE_DFORMAT).date() or dSchedStart
-        if dWeekStart == dSchedStart:
+        if (dWeekStart := sched.date_start < week_start and datetime.strptime(
+            week_start, OE_DFORMAT).date() or dSchedStart) == dSchedStart:
             sched_obj.add_restdays(
                 cr, uid, sched, 'restday_ids1', rest_days=nrest_days,
                 context=context

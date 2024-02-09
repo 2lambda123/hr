@@ -15,11 +15,9 @@ class HrPayslipEmployees(models.TransientModel):
         res = super(HrPayslipEmployees, self).compute_sheet()
         payslip_run = self.env['hr.payslip.run'].browse(
             self.env.context['active_id'])
-        move_date = payslip_run.move_date
-        if move_date:
+        if move_date := payslip_run.move_date:
             period_obj = self.env['account.period']
-            period_ids = period_obj.find(dt=move_date)
-            if period_ids:
+            if period_ids := period_obj.find(dt=move_date):
                 period_id = period_ids[0]
             else:
                 period_id = False

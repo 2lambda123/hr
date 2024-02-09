@@ -39,8 +39,7 @@ class HrEmployee(models.Model):
             'logged': False,
             'action': 'FALSE',
         }
-        employee = self.search([('rfid_card_code', '=', card_code)], limit=1)
-        if employee:
+        if employee := self.search([('rfid_card_code', '=', card_code)], limit=1):
             res['employee_name'] = employee.name
             res['employee_id'] = employee.id
         else:
@@ -49,8 +48,7 @@ class HrEmployee(models.Model):
             res['error_message'] = msg
             return res
         try:
-            attendance = employee.sudo().attendance_action_change()
-            if attendance:
+            if attendance := employee.sudo().attendance_action_change():
                 msg = _('Attendance recorded for employee %s') % employee.name
                 _logger.debug(msg)
                 res['logged'] = True
