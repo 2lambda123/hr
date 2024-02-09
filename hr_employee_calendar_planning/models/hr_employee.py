@@ -76,8 +76,7 @@ class HrEmployeeCalendar(models.Model):
                 ('employee_id', '=', calendar.employee_id.id),
                 ('id', '!=', calendar.id),
             ]
-            ncalendars = self.search_count(domain)
-            if ncalendars:
+            if ncalendars := self.search_count(domain):
                 raise ValidationError(_(
                     "You can't have 2 overlaping calendars!"))
 

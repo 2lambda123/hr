@@ -182,8 +182,7 @@ class hr_transfer(orm.Model):
         data = contract_obj.copy_data(
             cr, uid, contract_id, default=default, context=context)
 
-        c_id = contract_obj.create(cr, uid, data, context=context)
-        if c_id:
+        if c_id := contract_obj.create(cr, uid, data, context=context):
             vals = {}
             wkf = netsvc.LocalService('workflow')
 

@@ -298,8 +298,7 @@ class wage_increment(orm.Model):
                   'contract: ') + wi.contract_id.name
             data['notes'] = notes
 
-            c_id = hr_obj.create(cr, uid, data, context=context)
-            if c_id:
+            if c_id := hr_obj.create(cr, uid, data, context=context):
                 if wi.contract_id.notes:
                     notes = wi.contract_id.notes
                 else:
@@ -511,12 +510,11 @@ class hr_contract(orm.Model):
     def state_pending_done(self, cr, uid, ids, context=None):
 
         for i in ids:
-            wi_ids = self.pool.get('hr.contract.wage.increment').search(
+            if wi_ids := self.pool.get('hr.contract.wage.increment').search(
                 cr, uid, [
                     ('contract_id', '=', i),
                     ('state', 'in', ['draft', 'confirm']),
-                ], context=context)
-            if wi_ids:
+                ], context=context):
                 data = self.pool.get('hr.contract').read(
                     cr, uid, i, ['name'], context=context
                 )

@@ -308,10 +308,9 @@ class report_payslips(report_sxw.rml_parse):
         res = []
 
         for c in contract_obj.browse(self.cr, self.uid, contract_ids):
-            policy = accrual_policy_obj.get_latest_policy(
+            if (policy := accrual_policy_obj.get_latest_policy(
                 self.cr, self.uid, c.policy_group_id,
-                dToday)
-            if policy is None:
+                dToday)) is None:
                 continue
 
             for accrual_policy_line in policy.line_ids:

@@ -70,8 +70,7 @@ class wage_increment(orm.Model):
             data['wage'] = wi.wage
             data['date_start'] = wi.effective_date
 
-            c_id = hr_obj.create(cr, uid, data, context=context)
-            if c_id:
+            if c_id := hr_obj.create(cr, uid, data, context=context):
                 effective_date = datetime.strptime(wi.effective_date,
                                                    '%Y-%m-%d').date()
                 date_end = effective_date + relativedelta(days=1)
