@@ -31,6 +31,8 @@ from report import report_sxw
 class report_payroll_summary(report_sxw.rml_parse):
 
     def __init__(self, cr, uid, name, context):
+        """"""
+        
         super(report_payroll_summary, self).__init__(cr, uid, name, context)
 
         self.localcontext.update({
@@ -66,6 +68,16 @@ class report_payroll_summary(report_sxw.rml_parse):
         self.saved_run_id = -1
 
     def get_details_by_run(self, runs):
+        """"Returns a list of details for each run, including the run name and subtotal for each payslip in the run."
+        Parameters:
+            - runs (list): List of runs to retrieve details for.
+        Returns:
+            - list: List of dictionaries containing the run name and subtotal for each payslip in the run.
+        Processing Logic:
+            - Retrieve subtotal for each payslip in the run.
+            - Add run name to subtotal dictionary.
+            - Append subtotal dictionary to result list."""
+        
 
         res = []
         for run in runs:
@@ -75,6 +87,17 @@ class report_payroll_summary(report_sxw.rml_parse):
         return res
 
     def get_subtotal_by_payslip(self, payslips):
+        """Function to calculate the subtotal of payslips for a given employee.
+        Parameters:
+            - self (type): The object of the class.
+            - payslips (type): A list of payslips for the employee.
+        Returns:
+            - subtotal (dict): A dictionary containing the subtotal values for the employee's payslips.
+        Processing Logic:
+            - Iterate through the list of payslips.
+            - Calculate the subtotal by adding the values from each payslip.
+            - Return the subtotal dictionary."""
+        
 
         subtotal = {
             'name': '',
@@ -117,6 +140,8 @@ class report_payroll_summary(report_sxw.rml_parse):
     # the Pay Slip Details Report
     #
     def get_details_by_rule_category(self, obj):
+        """"""
+        
         payslip_line = self.pool.get('hr.payslip.line')
         rule_cate_obj = self.pool.get('hr.salary.rule.category')
 
@@ -244,42 +269,95 @@ class report_payroll_summary(report_sxw.rml_parse):
         return reg_line
 
     def get_basic(self, obj):
+        """ + obj.bonus
+        Calculates the total salary of an employee by adding their base salary and bonus.
+        Parameters:
+            - self (Employee): The employee whose salary is being calculated.
+            - obj (Employee): The employee whose bonus is being added to the salary.
+        Returns:
+            - float: The total salary of the employee.
+        Processing Logic:
+            - Add base salary and bonus.
+            - Bonus is optional.
+            - Returns a float value."""
+        
         return self.salary
 
     def get_ot(self, obj):
+        """[obj]
+        "Returns the value of the specified object from the self.ot dictionary.
+        Parameters:
+            - obj (str): The key of the object to retrieve from the dictionary.
+        Returns:
+            - str: The value of the specified object.
+        Processing Logic:
+            - Retrieve the value from self.ot dictionary.
+            - Only works for strings.
+            - Returns None if object does not exist.
+            - Key must be exact match.""""
+        
         return self.ot
 
     def get_transportation(self, obj):
+        """"Returns the transportation mode of the given object."
+        Parameters:
+            - obj (object): The object to retrieve the transportation mode from.
+        Returns:
+            - str: The transportation mode of the given object.
+        Processing Logic:
+            - Retrieve the transportation mode.
+            - No additional processing logic required."""
+        
         return self.transportation
 
     def get_allowances(self, obj):
+        """"""
+        
         return self.allowances
 
     def get_gross(self, obj):
+        """"""
+        
         return self.gross
 
     def get_taxable_gross(self, obj):
+        """"""
+        
         return self.taxable_gross
 
     def get_ded_fit(self, obj):
+        """"""
+        
         return self.ded_fit
 
     def get_ded_pf_ee(self, obj):
+        """"""
+        
         return self.ded_pf_ee
 
     def get_deduct(self, obj):
+        """"""
+        
         return self.deduct
 
     def get_total_deduct(self, obj):
+        """"""
+        
         return self.total_deduct
 
     def get_net(self, obj):
+        """"""
+        
         return self.net
 
     def get_er_contributions(self, obj):
+        """"""
+        
         return self.er_contributions
 
     def get_no(self):
+        """"""
+        
         self.no += 1
         return self.no
 
@@ -294,6 +372,8 @@ report_sxw.report_sxw(
 class report_payslips(report_sxw.rml_parse):
 
     def __init__(self, cr, uid, name, context):
+        """"""
+        
         super(report_payslips, self).__init__(cr, uid, name, context)
 
         self.localcontext.update({
@@ -302,6 +382,8 @@ class report_payslips(report_sxw.rml_parse):
         })
 
     def get_payslip_accruals(self, contract_ids, dToday):
+        """"""
+        
 
         accrual_policy_obj = self.pool.get('hr.policy.accrual')
         contract_obj = self.pool.get('hr.contract')
@@ -325,6 +407,8 @@ class report_payslips(report_sxw.rml_parse):
         return res
 
     def get_details_by_payslip(self, payslips):
+        """"""
+        
 
         accrual_obj = self.pool.get('hr.accrual')
 

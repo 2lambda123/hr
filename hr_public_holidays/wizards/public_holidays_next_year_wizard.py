@@ -35,6 +35,21 @@ class PublicHolidaysNextYearWizard(models.TransientModel):
 
     @api.onchange('template_ids', 'year')
     def onchange_year_template_ids(self):
+        """Function: onchange_year_template_ids
+        Parameters:
+            - self (object): The current record of the class.
+        Returns:
+            - public_holidays_next_year_day_ids (object): The updated record of the class.
+        Processing Logic:
+            - Set public_holidays_next_year_day_ids to False.
+            - Loop through each template in template_ids.
+            - Loop through each line in line_ids of the current template.
+            - Convert the date from string to Date object.
+            - Set new_year to the value of self.year or template.year + 1.
+            - Create a new record of public.holidays.next.year.day.wiz with the necessary fields.
+            - Set the next_date field to the last_date with the year replaced by new_year.
+            - Add the new_day record to public_holidays_next_year_day_ids."""
+        
         self.ensure_one()
         self.public_holidays_next_year_day_ids = False
         for template in self.template_ids:
@@ -54,6 +69,24 @@ class PublicHolidaysNextYearWizard(models.TransientModel):
 
     @api.multi
     def create_public_holidays(self):
+        """This function creates new public holidays based on a template for the current or next year.
+        Parameters:
+            - self (object): The current record.
+            - year (integer): The year for which the public holidays will be created, if not specified, the next year will be used.
+        Returns:
+            - action (dictionary): A dictionary containing the details of the action to be performed, including the type, name, view mode, and domain.
+        Processing Logic:
+            - Searches for existing public holidays templates.
+            - If no templates are found, raises an error.
+            - Iterates through the templates and selects the latest public holiday for each country.
+            - Creates new public holiday values based on the selected templates.
+            - If options were used to define next year's public holidays, looks for a matching day and creates a new date.
+            - If no match is found, the day is not created.
+            - Creates new public holiday lines based on the selected templates.
+            - Removes the year_id field from the new line values.
+            - Creates new public holidays using the new values.
+            - Returns a dictionary containing the details of the action to be performed."""
+        
 
         self.ensure_one()
 

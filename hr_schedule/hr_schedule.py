@@ -71,6 +71,28 @@ class hr_schedule(orm.Model):
     _description = 'Employee Schedule'
 
     def _compute_alerts(self, cr, uid, ids, field_name, args, context=None):
+        """Computes the alert IDs for each record.
+        Parameters:
+            - cr (object): Database cursor.
+            - uid (integer): ID of the current user.
+            - ids (list): List of record IDs.
+            - field_name (string): Name of the field being computed.
+            - args (dictionary): Additional arguments.
+            - context (dictionary): Dictionary of context values.
+        Returns:
+            - res (dictionary): Dictionary mapping record IDs to alert IDs.
+        Processing Logic:
+            - Create an empty dictionary with record IDs as keys.
+            - Loop through each record.
+            - Create an empty list to store alert IDs.
+            - Loop through each detail record associated with the current record.
+            - Add the IDs of all alerts associated with the detail record to the list.
+            - Update the dictionary with the list of alert IDs for the current record.
+            - Return the updated dictionary.
+        Example:
+            _compute_alerts(cr, uid, [1, 2, 3], 'field_name', {'arg1': 'value1'}, {'context1': 'value1'})
+            # Returns {1: [4, 5, 6], 2: [7, 8], 3: [9]}"""
+        
         res = dict.fromkeys(ids, '')
         for obj in self.browse(cr, uid, ids, context=context):
             alert_ids = []
@@ -206,6 +228,20 @@ class hr_schedule(orm.Model):
     }
 
     def _schedule_date(self, cr, uid, ids, context=None):
+        """Schedule a date for an employee.
+        Parameters:
+            - cr (database cursor): Database cursor.
+            - uid (integer): User ID.
+            - ids (list of integers): List of IDs.
+            - context (dictionary): Optional context dictionary.
+        Returns:
+            - boolean: True if date is available, False if not.
+        Processing Logic:
+            - Check if date is available.
+            - Get employee's schedule.
+            - Check if date overlaps with existing schedule.
+            - Return True if date is available, False if not."""
+        
         for shd in self.browse(cr, uid, ids, context=context):
             cr.execute("""\
 SELECT id
@@ -218,6 +254,20 @@ WHERE (date_start <= %s and %s <= date_end)
         return True
 
     def _rec_message(self, cr, uid, ids, context=None):
+        """"Returns an error message if there are overlapping schedules."
+        Parameters:
+            - cr (object): Database cursor.
+            - uid (integer): User ID.
+            - ids (list): List of schedule IDs.
+            - context (dictionary): Additional context for the function, if applicable.
+        Returns:
+            - string: Error message.
+        Processing Logic:
+            - Check for overlapping schedules.
+            - Return error message if found.
+            - Used in a try/except block to handle errors.
+            - Message is displayed to the user."""
+        
         return _('You cannot have schedules that overlap!')
 
     _constraints = [
@@ -324,6 +374,22 @@ WHERE (date_start <= %s and %s <= date_end)
 
     def onchange_employee_start_date(
             self, cr, uid, ids, employee_id, date_start, context=None):
+        """"Updates the start and end dates of an employee's schedule based on their start date and contract template.
+        Parameters:
+            - cr (object): Database cursor.
+            - uid (integer): ID of the current user.
+            - ids (list): List of IDs of the current records.
+            - employee_id (integer): ID of the employee.
+            - date_start (string): Start date of the employee's schedule in the format '%Y-%m-%d'.
+            - context (dictionary): Additional context information, if applicable.
+        Returns:
+            - res (dictionary): Dictionary containing the updated values for the start and end dates of the employee's schedule.
+        Processing Logic:
+            - Retrieves the employee's name and contract information.
+            - Calculates the end date of the schedule based on the start date.
+            - Updates the name of the schedule to include the start date and week number.
+            - Retrieves the contract template and updates the schedule template if applicable.""""
+        
 
         res = {
             'value': {
@@ -363,6 +429,23 @@ WHERE (date_start <= %s and %s <= date_end)
         return res
 
     def delete_details(self, cr, uid, sched_id, context=None):
+        """ True
+        Deletes all details associated with a schedule.
+        Parameters:
+            - cr (object): Database cursor.
+            - uid (integer): User ID.
+            - sched_id (integer): ID of the schedule to delete details from.
+            - context (dictionary): Additional context variables, if applicable.
+        Returns:
+            - boolean: True if details were successfully deleted.
+        Processing Logic:
+            - Get schedule details.
+            - Create a list of detail IDs to be deleted.
+            - Use the pool to unlink all detail IDs.
+            - Return True if successful.
+        Example:
+            delete_details(cr, uid, sched_id)"""
+        
 
         unlink_ids = []
         schedule = self.browse(cr, uid, sched_id, context=context)
@@ -374,6 +457,8 @@ WHERE (date_start <= %s and %s <= date_end)
 
     def add_restdays(
             self, cr, uid, schedule, field_name, rest_days=None, context=None):
+        """"""
+        
 
         _logger.warning('field: %s', field_name)
         _logger.warning('rest_days: %s', rest_days)
@@ -394,6 +479,8 @@ WHERE (date_start <= %s and %s <= date_end)
         return
 
     def create_details(self, cr, uid, sched_id, context=None):
+        """"""
+        
 
         leave_obj = self.pool.get('hr.holidays')
         schedule = self.browse(cr, uid, sched_id, context=context)
@@ -528,6 +615,8 @@ WHERE (date_start <= %s and %s <= date_end)
         return True
 
     def create(self, cr, uid, vals, context=None):
+        """"""
+        
 
         my_id = super(hr_schedule, self).create(cr, uid, vals, context=context)
 
@@ -581,6 +670,8 @@ WHERE (date_start <= %s and %s <= date_end)
                 sched_obj.create(cr, uid, sched, context=context)
 
     def deletable(self, cr, uid, sched_id, context=None):
+        """"""
+        
 
         sched = self.browse(cr, uid, sched_id, context=context)
         if sched.state not in ['draft', 'unlocked']:
@@ -592,6 +683,8 @@ WHERE (date_start <= %s and %s <= date_end)
         return True
 
     def unlink(self, cr, uid, ids, context=None):
+        """"""
+        
 
         detail_obj = self.pool.get('hr.schedule.detail')
 
@@ -617,6 +710,8 @@ WHERE (date_start <= %s and %s <= date_end)
             cr, uid, schedule_ids, context=context)
 
     def _workflow_common(self, cr, uid, ids, signal, next_state, context=None):
+        """"""
+        
 
         wkf = netsvc.LocalService('workflow')
         for sched in self.browse(cr, uid, ids, context=context):
@@ -628,10 +723,14 @@ WHERE (date_start <= %s and %s <= date_end)
         return True
 
     def workflow_validate(self, cr, uid, ids, context=None):
+        """"""
+        
         return self._workflow_common(
             cr, uid, ids, 'signal_validate', 'validate', context=context)
 
     def details_locked(self, cr, uid, ids, context=None):
+        """"""
+        
 
         for sched in self.browse(cr, uid, ids, context=context):
             for detail in sched.detail_ids:
@@ -680,6 +779,8 @@ class schedule_detail(orm.Model):
     _description = "Schedule Detail"
 
     def _day_compute(self, cr, uid, ids, field_name, args, context=None):
+        """"""
+        
         res = dict.fromkeys(ids, '')
         for obj in self.browse(cr, uid, ids, context=context):
             res[obj.id] = time.strftime(
@@ -687,6 +788,8 @@ class schedule_detail(orm.Model):
         return res
 
     def _get_ids_from_sched(self, cr, uid, ids, context=None):
+        """"""
+        
         res = []
         for sched in self.pool.get('hr.schedule').browse(
                 cr, uid, ids, context=context):
@@ -765,6 +868,8 @@ class schedule_detail(orm.Model):
     }
 
     def _detail_date(self, cr, uid, ids, context=None):
+        """"""
+        
         for dtl in self.browse(cr, uid, ids, context=context):
             cr.execute("""\
 SELECT id
@@ -777,6 +882,8 @@ WHERE (date_start <= %s and %s <= date_end)
         return True
 
     def _rec_message(self, cr, uid, ids, context=None):
+        """"""
+        
         return _('You cannot have scheduled days that overlap!')
 
     _constraints = [
@@ -785,6 +892,8 @@ WHERE (date_start <= %s and %s <= date_end)
 
     def scheduled_hours_on_day(
             self, cr, uid, employee_id, contract_id, dt, context=None):
+        """"""
+        
         dtDelta = timedelta(seconds=0)
         shifts = self.scheduled_begin_end_times(
             cr, uid, employee_id, contract_id, dt, context=context
@@ -820,6 +929,8 @@ WHERE (date_start <= %s and %s <= date_end)
         return res
 
     def scheduled_hours_on_day_from_range(self, d, range_dict):
+        """"""
+        
 
         dtDelta = timedelta(seconds=0)
         shifts = range_dict[d.strftime(OE_DFORMAT)]
@@ -938,6 +1049,8 @@ WHERE (date_start <= %s and %s <= date_end)
                 cr, uid, ee_id, strDay, context=context)
 
     def create(self, cr, uid, vals, context=None):
+        """"""
+        
 
         if 'day' not in vals and 'date_start' in vals:
             # TODO - Someone affected by DST should fix this

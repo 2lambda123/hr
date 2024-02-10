@@ -16,6 +16,19 @@ class HrEmployee(models.Model):
     )
 
     def _regenerate_calendar(self):
+        """Regenerates the employee's calendar based on their assigned work schedule.
+        Parameters:
+            - self (object): The current employee record.
+        Returns:
+            - None: The function does not return any value.
+        Processing Logic:
+            - Creates a new resource calendar if the employee does not have one or if their current calendar is active.
+            - Deletes all existing attendance lines in the employee's calendar.
+            - Loops through each work schedule assigned to the employee.
+            - For each work schedule, loops through the attendance lines in the corresponding resource calendar.
+            - Creates a new attendance line in the employee's calendar with the same details as the corresponding line in the resource calendar.
+            - The attendance line's date range is set to match the work schedule's start and end dates."""
+        
         self.ensure_one()
         if not self.calendar_id or self.calendar_id.active:
             self.calendar_id = self.env['resource.calendar'].create({
@@ -81,11 +94,32 @@ class HrEmployeeCalendar(models.Model):
                     "You can't have 2 overlaping calendars!"))
 
     def create(self, vals):
+        """"Creates a new record for an employee's calendar and regenerates the calendar for that employee."
+        Parameters:
+            - vals (dict): A dictionary containing the values for the new record.
+        Returns:
+            - record (object): The newly created record for the employee's calendar.
+        Processing Logic:
+            - Calls the create method from the parent class.
+            - Regenerates the calendar for the employee.
+            - Returns the newly created record."""
+        
         record = super(HrEmployeeCalendar, self).create(vals)
         record.employee_id._regenerate_calendar()
         return record
 
     def write(self, vals):
+        """"Updates the values of the current record and regenerates the calendar for the related employee(s)."
+        Parameters:
+            - vals (dict): Dictionary of fields to update.
+        Returns:
+            - bool: True if the record is successfully updated, False otherwise.
+        Processing Logic:
+            - Calls the write method of the parent class.
+            - Loops through the mapped employee(s).
+            - Calls the _regenerate_calendar method for each employee.
+            - Returns the result of the write method."""
+        
         res = super(HrEmployeeCalendar, self).write(vals)
         for employee in self.mapped('employee_id'):
             employee._regenerate_calendar()

@@ -90,6 +90,29 @@ class hr_policy(orm.Model):
     def _calculate_and_deposit(
         self, cr, uid, line, employee, job_id, dToday=None, context=None
     ):
+        """This function calculates and deposits an accrual amount for an employee based on their employment length and a specified accrual policy. It also creates a corresponding leave request and triggers the validation workflow.
+        Parameters:
+            - cr (object): Database cursor.
+            - uid (integer): ID of the current user.
+            - line (object): Object containing the accrual policy details.
+            - employee (object): Object containing the employee details.
+            - job_id (integer): ID of the employee's job.
+            - dToday (date, optional): Date to use for calculation. Defaults to current date.
+            - context (dictionary, optional): Dictionary of context values. Defaults to None.
+        Returns:
+            - None
+        Processing Logic:
+            - Gets the months of service and hire date for the employee.
+            - Checks if the accrual policy is based on a calendar.
+            - Calculates the number of days the employee has been employed.
+            - Checks if the minimum employment days requirement is met.
+            - Determines the frequency and amount of the accrual.
+            - Deposits the accrual amount to the specified account.
+            - Creates a leave request and triggers the validation workflow.
+            - Adds the accrual line and leave request to the employee's job for the policy.
+        Example:
+            _calculate_and_deposit(cr, uid, line, employee, job_id, dToday=date(2021, 5, 1), context=context)"""
+        
 
         leave_obj = self.pool.get('hr.holidays')
         accrual_obj = self.pool.get('hr.accrual')
@@ -254,6 +277,21 @@ class hr_policy(orm.Model):
             context=context)
 
     def _get_last_calculation_date(self, cr, uid, accrual_id, context=None):
+        """Returns the last calculation date for a given accrual policy line.
+        Parameters:
+            - cr (object): Database cursor.
+            - uid (integer): User ID.
+            - accrual_id (integer): ID of the accrual policy line.
+            - context (dictionary): Additional context for the function, if applicable.
+        Returns:
+            - date: The last calculation date for the given accrual policy line.
+        Processing Logic:
+            - Get the job object from the pool.
+            - Search for job IDs that match the given accrual policy line.
+            - Sort the job IDs in descending order and limit to 1.
+            - If no job IDs are found, return None.
+            - Read the name field from the job object and convert it to a date using the specified date format."""
+        
 
         job_obj = self.pool.get('hr.policy.line.accrual.job')
 
@@ -268,6 +306,22 @@ class hr_policy(orm.Model):
         return datetime.strptime(data['name'], OE_DATEFORMAT).date()
 
     def try_calculate_accruals(self, cr, uid, context=None):
+        """Calculates accruals for employees based on the company's accrual policy.
+        Parameters:
+            - cr (database cursor): The database cursor.
+            - uid (integer): The current user's ID.
+            - context (dictionary, optional): A dictionary of context values. Defaults to None.
+        Returns:
+            - True (boolean): Indicates that the function has completed successfully.
+        Processing Logic:
+            - Get the latest accrual policy for the company.
+            - For each accrual line in the policy, determine the last time the accrual job was run.
+            - If this is the first time the job is being run, start it from today.
+            - For each accrual line, run the job for each day from the last run date until today.
+            - Create a job for each accrual line.
+            - For each contract attached to the policy group, calculate and deposit the accrual for the specified date.
+            - Do not double-count employees with multiple valid contracts."""
+        
 
         pg_obj = self.pool.get('hr.policy.group')
         job_obj = self.pool.get('hr.policy.line.accrual.job')
@@ -475,6 +529,27 @@ class hr_holidays(orm.Model):
         self, cr, uid, today, holiday_status_id, employee_id, days,
         context=None
     ):
+        """This function performs accrual for a given employee and holiday status.
+        Parameters:
+            - cr (object): Database cursor.
+            - uid (integer): User ID.
+            - today (date): Current date.
+            - holiday_status_id (integer): ID of the holiday status.
+            - employee_id (integer): ID of the employee.
+            - days (float): Number of days to be accrued.
+            - context (dictionary): Additional context information, if applicable.
+        Returns:
+            - None.
+        Processing Logic:
+            - Gets the accrual and accrual line objects.
+            - Searches for accruals with the given holiday status ID.
+            - If no accruals are found, the function returns.
+            - Creates an accrual line with the given information.
+            - Adds the line to the accrual.
+            - Returns nothing.
+        Example:
+            _do_accrual(cr, uid, today, holiday_status_id, employee_id, days, context=context)"""
+        
 
         accrual_obj = self.pool.get('hr.accrual')
         accrual_line_obj = self.pool.get('hr.accrual.line')
@@ -502,6 +577,8 @@ class hr_holidays(orm.Model):
         return
 
     def holidays_validate(self, cr, uid, ids, context=None):
+        """"""
+        
 
         res = super(hr_holidays, self).holidays_validate(
             cr, uid, ids, context=context)
@@ -531,6 +608,8 @@ class hr_holidays(orm.Model):
         return res
 
     def holidays_refuse(self, cr, uid, ids, context=None):
+        """"""
+        
 
         if isinstance(ids, (int, long)):
             ids = [ids]

@@ -50,6 +50,20 @@ class hr_contract(models.Model):
     @api.multi
     @api.constrains('contract_job_ids')
     def _check_one_main_job(self):
+        """Checks if a contract has one and only one main job assigned.
+        Parameters:
+            - self (object): A contract object.
+        Returns:
+            - None: If the contract has no job assigned.
+            - exceptions.Warning: If the contract has more than one main job assigned.
+        Processing Logic:
+            - Checks if the contract has any job assigned.
+            - Filters the assigned jobs to only include main jobs.
+            - Raises an exception if there is not exactly one main job assigned.
+        Example:
+            contract = self.env['hr.contract'].browse(contract_id)
+            contract._check_one_main_job()"""
+        
         for contract in self:
             # if the contract has no job assigned, a main job
             # is not required. Otherwise, one main job assigned is
