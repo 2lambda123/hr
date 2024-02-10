@@ -11,6 +11,17 @@ class HrPayslipEmployees(models.TransientModel):
 
     @api.multi
     def compute_sheet(self):
+        """Computes the payslip sheet for employees.
+        Parameters:
+            - self (object): The current object.
+        Returns:
+            - res (object): The result of the computation.
+        Processing Logic:
+            - Get the payslip run from the context.
+            - If a move date is provided, find the corresponding period.
+            - Update the payslip's move date and period.
+            - Return the result of the computation."""
+        
 
         res = super(HrPayslipEmployees, self).compute_sheet()
         payslip_run = self.env['hr.payslip.run'].browse(

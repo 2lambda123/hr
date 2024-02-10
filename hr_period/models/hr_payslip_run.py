@@ -43,6 +43,17 @@ class HrPayslipRun(models.Model):
     @api.multi
     @api.constrains('hr_period_id', 'company_id')
     def _check_period_company(self):
+        """Check if the company on the selected period is the same as the company on the payslip batch.
+        Parameters:
+            - self (object): The payslip batch object.
+        Returns:
+            - None: This function does not return any value.
+        Processing Logic:
+            - Loop through each payslip batch.
+            - Check if the payslip batch has a HR period ID.
+            - If it does, check if the company on the HR period is the same as the company on the payslip batch.
+            - If not, raise a UserError."""
+        
         for run in self:
             if run.hr_period_id:
                 if run.hr_period_id.company_id != run.company_id:
@@ -53,6 +64,17 @@ class HrPayslipRun(models.Model):
     @api.multi
     @api.constrains('hr_period_id', 'schedule_pay')
     def _check_period_schedule(self):
+        """Checks if the schedule on the selected period matches the schedule on the payslip batch.
+        Parameters:
+            - self (object): The current object.
+        Returns:
+            - None: This function does not return any value.
+        Processing Logic:
+            - Loop through each run in the object.
+            - Check if the run has a hr_period_id.
+            - If it does, compare the schedule_pay of the hr_period_id to the schedule_pay of the payslip batch.
+            - If they do not match, raise a UserError with a specific message."""
+        
         for run in self:
             if run.hr_period_id:
                 if run.hr_period_id.schedule_pay != run.schedule_pay:
@@ -62,6 +84,8 @@ class HrPayslipRun(models.Model):
 
     @api.model
     def get_default_schedule(self, company_id):
+        """"""
+        
         company = self.env['res.company'].browse(company_id)
 
         fys = self.env['hr.fiscalyear'].search([('state', '=', 'open'),
@@ -75,6 +99,8 @@ class HrPayslipRun(models.Model):
     @api.multi
     @api.onchange('company_id', 'schedule_pay')
     def onchange_company_id(self):
+        """"""
+        
         self.ensure_one()
         schedule_pay = self.schedule_pay or self.get_default_schedule(
             self.company_id.id)
@@ -85,6 +111,8 @@ class HrPayslipRun(models.Model):
 
     @api.onchange('hr_period_id')
     def onchange_period_id(self):
+        """"""
+        
         if period := self.hr_period_id:
             self.date_start = period.date_start
             self.date_end = period.date_end
@@ -130,6 +158,8 @@ class HrPayslipRun(models.Model):
 
     @api.multi
     def close_payslip_run(self):
+        """"""
+        
         for run in self:
             if next((p for p in run.slip_ids if p.state == 'draft'), False):
                 raise UserError(_("The payslip batch %s still has unconfirmed "
@@ -139,12 +169,16 @@ class HrPayslipRun(models.Model):
 
     @api.multi
     def draft_payslip_run(self):
+        """"""
+        
         for run in self:
             run.hr_period_id.button_re_open()
         return super(HrPayslipRun, self).draft_payslip_run()
 
     @api.multi
     def update_periods(self):
+        """"""
+        
         self.ensure_one()
         if period := self.hr_period_id:
             # Close the current period
